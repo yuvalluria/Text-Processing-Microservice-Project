@@ -1,0 +1,5 @@
+grpcio==1.60.0
+grpcio-tools==1.60.0
+nltk==3.8.1
+textblob==0.17.1
+asyncio-grpc==1.6
