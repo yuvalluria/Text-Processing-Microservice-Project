@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package text_processor;
+
+service TextProcessor {
+    rpc ProcessText (ProcessTextRequest) returns (ProcessTextResponse);
+}
+
+message ProcessTextRequest {
+    string text = 1;
+}
+
+message ProcessTextResponse {
+    string summary = 1;
+    string sentiment = 2;
+    repeated string keywords = 3;
+    int32 original_length = 4;
+    int32 processed_length = 5;
+}
