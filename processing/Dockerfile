@@ -4,29 +4,21 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY processor/requirements.txt .
+# Copy requirements and install
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir fastapi uvicorn nltk textblob
 
-# Install Python dependencies
-RUN pip install --no-cache-dir grpcio grpcio-tools nltk textblob
+# Copy application
+COPY app/ .
 
-# Copy proto file and generate gRPC files
-COPY processor/text_processor.proto .
-RUN python -m grpc_tools.protoc \
-    --proto_path=. \
-    --python_out=. \
-    --grpc_python_out=. \
-    text_processor.proto
+# Download NLTK data
+RUN python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
 
-# Copy application code
-COPY processor/ .
+# Expose port
+EXPOSE 8000
 
-# Expose gRPC port
-EXPOSE 50051
-
-# Run the server
-CMD ["python", "server.py"]
+# Run the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
